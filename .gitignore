@@ -1,4 +1,3 @@
-dist
 src/*.js
 test/*.js
 # Logs

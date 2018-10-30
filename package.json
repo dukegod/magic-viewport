@@ -1,7 +1,7 @@
 {
   "name": "magic-viewport",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "tsc-test": "yarn tsc test/*.spec.ts -m commonjs -t es6",
     "server": "./node_modules/.bin/hs -p 9876",
@@ -12,7 +12,7 @@
   "devDependencies": {
     "@types/chai": "^4.1.6",
     "@types/mocha": "^5.2.5",
-    "@types/node": "^10.11.0",
+    "@types/node": "^10.12.1",
     "chai": "^4.2.0",
     "http-server": "^0.11.1",
     "mocha": "^5.2.0",

@@ -8,7 +8,7 @@ interface MVInterface {
     baseScale: number
 }
 
-const opt: MVInterface ={
+const opt: MVInterface = {
     fontSize: 14,
     baseWidth: 540,
     baseScale: 0,
@@ -19,102 +19,113 @@ class MagicViewport {
     private fSize: number;
     private bWidth: number;
     private dpr: number;
-    private timer: number;
+    private timer: any;
+
     constructor(opt: MVInterface) {
         this.bScale = opt.baseScale
         this.fSize = opt.fontSize
         this.bWidth = opt.baseWidth
         this.dpr = 0
         this.timer = 0
+        this.setRootDpr()
         this.init()
     }
+
     get $Win() {
         return window
     }
+
     get $doc() {
         return window.document
     }
-    get $html() {
+
+    get docEle() {
         return this.$doc.documentElement
     }
+
     get $dpr() {
         return this.$Win.devicePixelRatio || 1
     }
+
     get $version() {
         return (
-            this.$Win.navigator.appVersion.match(/android/ig),
-            this.$Win.navigator.appVersion.match(/iphone/ig)
+            this.$Win.navigator.appVersion.match(/android/gi) ||
+            this.$Win.navigator.appVersion.match(/iphone/gi)
         )
     }
-    
+
     init() {
-        this.$Win.addEventListener('resize', ()=> {
+        this.$Win.addEventListener('resize', () => {
             clearTimeout(this.timer);
-            this.timer = setTimeout(this.geneteMeta, 300);
+            this.timer = setTimeout(this.setRootDpr, 300);
         }, false);
-        this.$Win.addEventListener('pageshow', (e) =>{
+        this.$Win.addEventListener('pageshow', (e) => {
             if (e.persisted) {
                 clearTimeout(this.timer);
-                this.timer = setTimeout(this.geneteMeta, 300);
+                this.timer = setTimeout(this.setRootDpr, 300);
             }
         }, false);
 
         if (this.$doc.readyState === 'complete') {
-            this.$doc.body.style.fontSize = 12 * this.dpr + 'px';
+            // this.$doc.body.style.fontSize = 12 * this.dpr + 'px';
         } else {
-            this.$doc.addEventListener('DOMContentLoaded', (e) =>{
+            this.$doc.addEventListener('DOMContentLoaded', (e) => {
                 // @ts-ignore
-                this.$doc.body.style.fontSize = 12 * this.dpr + 'px';
+                // this.$doc.body.style.fontSize = 12 * this.dpr + 'px';
             }, false);
         }
 
     }
-    
-    
+
+
     setRootDpr() {
         const DPR = this.$dpr;
+
+        console.log(this.$version)
+
         if (this.$version) {
-            if (DPR && DPR>=3) {
-                this.dpr = DPR
-            } else if (DPR && DPR>=2) {
+            if (DPR && DPR >= 3) {
+                this.dpr = 3
+            } else if (DPR && DPR >= 2) {
                 this.dpr = 2
             } else {
                 this.dpr = 1
             }
         }
-    }
 
-    setRootSize() {
-        this.setRootDpr()
-        let htmlWidth;
-        // @ts-ignore
-        htmlWidth = this.$html.getBoundingClientRect().width || this.$html.clientWidth;
-        htmlWidth / this.dpr > this.bWidth && (htmlWidth = this.bWidth * this.dpr)
-        let fontSize = htmlWidth / 10;
-        // @ts-ignore
-        this.$html.style.fontSize = fontSize + "px";
-        // @ts-ignore
-        this.$html.setAttribute('data-dpr', this.dpr);
-    }
+        this.bScale = 1 / this.dpr
 
-    geneteMeta() {
-        this.setRootSize()
         let metaViewport = document.querySelector('meta[name="viewport"]')
         // @ts-ignore
         metaViewport && (metaViewport.remove ? metaViewport.remove() : metaViewport.parentElement.removeChild(metaViewport));
-        metaViewport = this.$doc.createElement("meta");
+        metaViewport = this.$doc && this.$doc.createElement("meta");
         metaViewport.setAttribute("name", "viewport");
-        metaViewport.setAttribute("content", "width=device-width, initial-scale=" + this.dpr + ", maximum-scale=" + this.dpr + ", minimum-scale=" + this.dpr + ", user-scalable=no");
-        if (this.$doc.firstElementChild) {
-            this.$doc.firstElementChild.appendChild(metaViewport)
+        metaViewport.setAttribute(
+            "content",
+            "width=device-width, initial-scale=" + this.bScale + ", maximum-scale=" + this.bScale + ", minimum-scale=" + this.bScale + ", user-scalable=no"
+        );
+        // @ts-ignore
+        if (this.docEle.firstElementChild) {
+            // @ts-ignore
+            this.docEle.firstElementChild.appendChild(metaViewport);
         } else {
-            const div = this.$doc.createElement("div");
-            div.appendChild(metaViewport)
-            this.$doc.write(div.innerHTML)
+            let wrap = this.$doc.createElement('div');
+            wrap.appendChild(metaViewport);
+            this.$doc.write(wrap.innerHTML);
         }
-    }
 
+        let htmlWidth;
+        // @ts-ignore
+        htmlWidth = this.docEle.getBoundingClientRect().width || this.docEle.clientWidth;
+        htmlWidth / this.dpr > this.bWidth && (htmlWidth = this.bWidth * this.dpr)
+        let fontSize = htmlWidth / 10;
+        // @ts-ignore
+        this.docEle.style.fontSize = fontSize + "px";
+        // @ts-ignore
+        this.docEle.setAttribute('data-dpr', this.dpr);
+    }
 }
 
-export = new MagicViewport(opt)
+new MagicViewport(opt);
+
 
