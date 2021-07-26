@@ -8,22 +8,22 @@ interface MVInterface {
   baseScale: number;
 }
 
-const opt: MVInterface = {
-  fontSize: 14,
-  baseWidth: 540,
-  baseScale: 0
-};
+// const opt: MVInterface = {
+//   fontSize: 14,
+//   baseWidth: 750,
+//   baseScale: 0
+// };
 
-class MagicViewport {
+export default class MagicViewport {
   private bScale: number;
-  private fSize: number;
+//   private fSize: number;
   private bWidth: number;
   private dpr: number;
   private timer: any;
 
   constructor(opt: MVInterface) {
     this.bScale = opt.baseScale;
-    this.fSize = opt.fontSize;
+    // this.fSize = opt.fontSize;
     this.bWidth = opt.baseWidth;
     this.dpr = 0;
     this.timer = 0;
@@ -69,6 +69,8 @@ class MagicViewport {
         if (e.persisted) {
           clearTimeout(this.timer);
           this.timer = setTimeout(this.setRootDpr, 300);
+        } else {
+            console.log(e)
         }
       },
       false
@@ -82,6 +84,7 @@ class MagicViewport {
         e => {
           // @ts-ignore
           // this.$doc.body.style.fontSize = 12 * this.dpr + 'px';
+          console.log(e)
         },
         false
       );
@@ -107,10 +110,6 @@ class MagicViewport {
 
     let metaViewport = document.querySelector('meta[name="viewport"]');
     // @ts-ignore
-    metaViewport &&
-      (metaViewport.remove
-        ? metaViewport.remove()
-        : metaViewport.parentElement.removeChild(metaViewport));
     metaViewport = this.$doc && this.$doc.createElement('meta');
     metaViewport.setAttribute('name', 'viewport');
     metaViewport.setAttribute(
@@ -135,8 +134,7 @@ class MagicViewport {
 
     let htmlWidth;
     // @ts-ignore
-    htmlWidth =
-      this.docEle.getBoundingClientRect().width || this.docEle.clientWidth;
+    htmlWidth = this.docEle && this.docEle.getBoundingClientRect().width || this.docEle.clientWidth;
     htmlWidth / this.dpr > this.bWidth && (htmlWidth = this.bWidth * this.dpr);
     let fontSize = htmlWidth / 10;
     // @ts-ignore
@@ -146,4 +144,21 @@ class MagicViewport {
   }
 }
 
-new MagicViewport(opt);
+
+const defaultOpt = {
+  fontSize: 14,
+  baseWidth: 750,
+  baseScale: 0
+}
+
+const magicViewport =  () => {
+  let instance:any = null;
+
+  if (instance instanceof MagicViewport) {
+    return instance
+  } else {
+    return instance = new MagicViewport(defaultOpt)
+  }
+}
+
+magicViewport()

@@ -6,6 +6,7 @@
     "tsc-test": "yarn tsc test/*.spec.ts -m commonjs -t es6",
     "server": "./node_modules/.bin/hs -p 9876",
     "tsc": "./node_modules/typescript/bin/tsc -w",
+    "build": "./node_modules/typescript/bin/tsc",
     "test": "./node_modules/mocha/bin/mocha -r ts-node/register test/*.spec.ts"
   },
   "repository": "git+https://dukegod@github.com/dukegod/magic-viewport.git",
